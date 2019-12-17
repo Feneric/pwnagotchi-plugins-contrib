@@ -35,9 +35,9 @@ class Fortune(Plugin):
         lang = config['main']['lang'][:2]
         if lang not in self.langs:
             lang = ''
-        alt_cmd = config['plugins']['fortune'].get('alt_cmd', None)
-        cmd = alt_cmd or '/usr/games/fortune -s {}'.format(lang)
-        proc = run((cmd), stdout=PIPE)
+        alt_cmd = config['plugins']['fortune'].get('alt_cmd', '')
+        cmd = alt_cmd.split() or ['/usr/games/fortune', '-s', lang]
+        proc = run(cmd, stdout=PIPE)
         self.fortune = proc.stdout.decode('utf-8')
         logging.info("[fortune] {}".format(self.fortune))
         display.update(force=True)
@@ -45,20 +45,20 @@ class Fortune(Plugin):
     def on_loaded(self):
         logging.info("Fortune plugin loaded")
 
-    def on_bored(self, agent, filename, access_point, client_station):
+    def on_bored(self, agent):
         if random() > .6:
             self.set_fortune(agent)
 
-    def on_lonely(self, agent, filename, access_point, client_station):
+    def on_lonely(self, agent):
         if random() > .8:
             self.set_fortune(agent)
 
-    def on_sad(self, agent, filename, access_point, client_station):
+    def on_sad(self, agent):
         if random() > .9:
             self.set_fortune(agent)
 
     def on_ui_update(self, ui):
         if self.fortune:
-            ui.set('face', choice('(☉‗☉ )', '( ☉‗☉)')
+            ui.set('face', choice('(☉‗☉ )', '( ☉‗☉)'))
             ui.set('status', self.fortune)
             self.fortune = ""
