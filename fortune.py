@@ -32,11 +32,17 @@ class Fortune(Plugin):
     def set_fortune(self, agent):
         display = agent.view()
         config = agent.config()
-        lang = config['main']['lang'][:2]
-        if lang not in self.langs:
+        try:
+            lang = config['main']['lang'][:2]
+            if lang not in self.langs:
+                lang = ''
+        except KeyError:
             lang = ''
-        alt_cmd = config['plugins']['fortune'].get('alt_cmd', '')
-        cmd = alt_cmd.split() or ['/usr/games/fortune', '-s', lang]
+        try:
+            alt_cmd = config['plugins']['fortune']['alt_cmd']
+        except KeyError:
+            alt_cmd = ''
+        cmd = alt_cmd.split() or ['/usr/games/fortune', '-s', '-n', '120', lang]
         proc = run(cmd, stdout=PIPE)
         self.fortune = proc.stdout.decode('utf-8')
         logging.info("[fortune] {}".format(self.fortune))
@@ -46,7 +52,7 @@ class Fortune(Plugin):
         logging.info("Fortune plugin loaded")
 
     def on_bored(self, agent):
-        if random() > .6:
+        if random() > .5:
             self.set_fortune(agent)
 
     def on_lonely(self, agent):
@@ -59,6 +65,6 @@ class Fortune(Plugin):
 
     def on_ui_update(self, ui):
         if self.fortune:
-            ui.set('face', choice('(☉‗☉ )', '( ☉‗☉)'))
+            ui.set('face', choice(['(☉‗☉ )', '( ☉‗☉)']))
             ui.set('status', self.fortune)
             self.fortune = ""
