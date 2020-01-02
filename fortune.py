@@ -37,7 +37,7 @@ class Fortune(plugins.Plugin):
         if lang not in Fortune.__langs:
             lang = ''
         try:
-            alt_cmd = config['plugins']['fortune']['alt_cmd']
+            alt_cmd = config['main']['plugins']['fortune']['alt_cmd']
         except KeyError:
             alt_cmd = ''
         fortune_length = 120
