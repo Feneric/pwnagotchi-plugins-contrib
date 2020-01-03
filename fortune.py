@@ -40,7 +40,10 @@ class Fortune(plugins.Plugin):
             alt_cmd = config['main']['plugins']['fortune']['alt_cmd']
         except KeyError:
             alt_cmd = ''
-        fortune_length = 120
+        try:
+            fortune_length = config['main']['plugins']['fortune']['length']
+        except KeyError:
+            fortune_length = 120
         cmd = alt_cmd.split() or ['/usr/games/fortune', '-s', '-n', str(fortune_length), lang]
         proc = run(cmd, stdout=PIPE)
         fortune = proc.stdout.decode('utf-8')
